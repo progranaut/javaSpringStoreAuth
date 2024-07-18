@@ -20,6 +20,7 @@ app:
     secret: "someSecretKey"
     tokenExpiration: 3m
     refreshTokenExpiration: 30m
+    mainSender: "main_sender"
 
 feign:
   url: http://localhost:8082

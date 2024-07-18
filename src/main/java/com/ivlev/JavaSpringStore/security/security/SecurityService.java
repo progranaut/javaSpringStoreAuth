@@ -9,6 +9,7 @@ import com.ivlev.JavaSpringStore.security.service.FeignService;
 import com.ivlev.JavaSpringStore.security.service.RefreshTokenService;
 import com.ivlev.JavaSpringStore.security.web.dto.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,6 +36,9 @@ public class SecurityService {
     private final PasswordEncoder passwordEncoder;
 
     private final FeignService feignService;
+
+    @Value("${app.jwt.mainSender}")
+    private String mainSender;
 
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
 
@@ -73,7 +77,10 @@ public class SecurityService {
 
         securityUser = securityUserRepository.save(securityUser);
 
-        feignService.sendUser(securityUser);
+        String senderJwtToken = jwtUtils.generateTokenFromUsername(mainSender);
+
+        feignService.sendUser("Bearer " + senderJwtToken, securityUser);
+
     }
 
     public RefreshTokenResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {

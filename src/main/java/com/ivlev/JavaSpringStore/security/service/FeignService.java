@@ -14,9 +14,9 @@ public class FeignService {
 
     private final FeignImpl feign;
 
-    public void sendUser(SecurityUser securityUser) {
+    public void sendUser(String jwt, SecurityUser securityUser) {
 
-        feign.sendUser(SendUserToApp.builder()
+        feign.sendUser(jwt, SendUserToApp.builder()
                         .id(securityUser.getId().toString())
                         .email(securityUser.getName())
                         .roles(securityUser.getRoles().stream()
