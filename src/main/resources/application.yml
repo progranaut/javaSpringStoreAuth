@@ -20,7 +20,7 @@ spring:
 
 app:
   jwt:
-    secret: "someSecretKey"
+    secret: someSecretKey
     tokenExpiration: 10m
     refreshTokenExpiration: 30m
     mainSender: "main_sender"
