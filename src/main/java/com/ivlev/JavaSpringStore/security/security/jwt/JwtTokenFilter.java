@@ -28,36 +28,28 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final UserDetailServiceImpl userDetailService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
           try {
               String jwtToken = getToken(request);
               if (jwtToken != null && jwtUtils.validate(jwtToken)) {
                   String username = jwtUtils.getUsername(jwtToken);
                   UserDetails userDetails = userDetailService.loadUserByUsername(username);
-
                   UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
                           null, userDetails.getAuthorities());
-
                   authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                   SecurityContextHolder.getContext().setAuthentication(authentication);
               }
           } catch (Exception e) {
               log.error("Невозможно установить аутентификацию пользователя: {}", e.getMessage());
           }
-
           filterChain.doFilter(request, response);
     }
-
     private String getToken(HttpServletRequest request) {
-
         String headerAuth = request.getHeader(HttpHeaders.AUTHORIZATION);
-
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
             return headerAuth.substring(7);
         }
-
         return null;
-
     }
 }
