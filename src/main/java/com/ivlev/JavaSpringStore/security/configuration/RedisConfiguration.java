@@ -25,26 +25,19 @@ public class RedisConfiguration {
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory(RedisProperties redisProperties) {
-
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
-
         configuration.setHostName((redisProperties.getHost()));
         configuration.setPort(redisProperties.getPort());
-
         return new JedisConnectionFactory(configuration);
     }
 
     public class RefreshTokenKeyspaceConfiguration extends KeyspaceConfiguration {
         private static final String REFRESH_TOKEN_KEYSPACE = "refresh_tokens";
-
         @Override
         protected Iterable<KeyspaceSettings> initialConfiguration() {
             KeyspaceSettings keyspaceSettings = new KeyspaceSettings(RefreshToken.class, REFRESH_TOKEN_KEYSPACE);
-
             keyspaceSettings.setTimeToLive(refreshTokenExpiration.getSeconds());
-
             return Collections.singleton(keyspaceSettings);
         }
     }
-
 }

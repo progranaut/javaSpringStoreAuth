@@ -41,23 +41,17 @@ public class SecurityService {
     private String mainSender;
 
     public AuthResponse authenticateUser(LoginRequest loginRequest) {
-
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginRequest.getUsername(),
                 loginRequest.getPassword()
         ));
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         AppUserDetails userDetails = (AppUserDetails) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
-
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
-
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-
         return AuthResponse.builder()
                 .id(userDetails.getId())
                 .token(jwtUtils.generateJwtToken(userDetails))
@@ -65,7 +59,6 @@ public class SecurityService {
                 .username(userDetails.getUsername())
                 .roles(roles)
                 .build();
-
     }
 
     public void register(CreateUserRequest createUserRequest) {
@@ -84,12 +77,10 @@ public class SecurityService {
     }
 
     public RefreshTokenResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
-
         String requestRefreshToken = refreshTokenRequest.getRefreshToken();
-
         return refreshTokenService.findByRefreshToken(requestRefreshToken)
-                .map(token -> refreshTokenService.checkRefreshToken(token))
-                .map(token -> token.getUserId())
+                .map(refreshTokenService::checkRefreshToken)
+                .map(RefreshToken::getUserId)
                 .map(userId -> {
                     SecurityUser tokenOwner = securityUserRepository.findById(userId).orElseThrow(()->
                         new RefreshTokenException("Ошибка при получении пользователя по айди: " + userId));
@@ -99,7 +90,6 @@ public class SecurityService {
                             .refreshToken(refreshTokenService.createRefreshToken(userId).getToken())
                             .build();
                 }).orElseThrow(()-> new RefreshTokenException(requestRefreshToken, "Рефрешь токен не найден!"));
-
     }
 
     public void logout() {
