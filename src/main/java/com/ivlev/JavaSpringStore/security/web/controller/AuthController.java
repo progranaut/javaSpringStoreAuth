@@ -44,7 +44,6 @@ public class AuthController {
         return ResponseEntity.ok(securityService.refreshToken(request));
     }
 
-
     @PostMapping("/logout")
     public ResponseEntity<SimpleResponse> logout(@AuthenticationPrincipal UserDetails userDetails) {
         securityService.logout();
